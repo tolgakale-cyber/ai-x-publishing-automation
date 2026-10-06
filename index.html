@@ -1,0 +1,686 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Yapay zeka destekli senaryo, kalite kontrolü, seslendirme, stok video seçimi ve final MP4 üretimini otomatikleştiren modüler video sistemi.">
+<title>Yapay Zeka Destekli Video Otomasyonu</title>
+
+<style>
+:root{
+  --bg:#080b11;
+  --card:#11161f;
+  --card2:#0d121a;
+  --line:#27303c;
+  --text:#f1f4f8;
+  --muted:#a8b0bd;
+  --accent:#66f1be
+}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:Inter,system-ui,-apple-system,"Segoe UI",Arial,sans-serif
+}
+
+main{
+  max-width:1120px;
+  margin:auto;
+  padding:72px 28px 100px
+}
+
+.eyebrow,.num{
+  color:var(--accent);
+  font-size:12px;
+  font-weight:800;
+  letter-spacing:.14em
+}
+
+h1{
+  font-size:clamp(42px,7vw,76px);
+  line-height:1.02;
+  max-width:1000px;
+  margin:18px 0 24px;
+  letter-spacing:-.03em
+}
+
+.lead{
+  color:var(--muted);
+  font-size:20px;
+  line-height:1.7;
+  max-width:860px
+}
+
+.tag{
+  display:inline-block;
+  margin-top:18px;
+  padding:8px 12px;
+  border-radius:999px;
+  background:#17352d;
+  color:var(--accent);
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:.08em
+}
+
+section{padding-top:76px}
+
+.section-head{
+  display:grid;
+  grid-template-columns:90px 1fr;
+  gap:12px;
+  align-items:start;
+  margin-bottom:26px
+}
+
+.section-head h2{
+  font-size:30px;
+  margin:0;
+  letter-spacing:-.02em
+}
+
+.section-head p{
+  grid-column:2;
+  color:var(--muted);
+  line-height:1.7;
+  max-width:820px;
+  margin:8px 0 0
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:18px
+}
+
+.grid.three{
+  grid-template-columns:repeat(3,1fr)
+}
+
+.card,.panel{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:28px
+}
+
+.card h3{
+  font-size:19px;
+  margin:0 0 12px
+}
+
+.card p,.card li,.panel p{
+  color:var(--muted);
+  line-height:1.65
+}
+
+.card ul{
+  padding-left:20px;
+  margin-bottom:0
+}
+
+.flow{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:30px;
+  overflow:auto
+}
+
+.flow pre{
+  margin:0;
+  color:var(--accent);
+  font-size:14px;
+  line-height:1.85;
+  font-family:"SFMono-Regular",Consolas,monospace
+}
+
+.small{
+  font-size:13px;
+  color:var(--muted)
+}
+
+.accent{
+  color:var(--accent)
+}
+
+.arch{
+  display:grid;
+  grid-template-columns:1fr auto 1fr auto 1fr;
+  gap:14px;
+  align-items:center
+}
+
+.node{
+  padding:22px 18px;
+  text-align:center;
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:16px
+}
+
+.arrow{
+  color:var(--accent);
+  font-weight:900
+}
+
+.github-btn{
+  display:inline-block;
+  margin-top:18px;
+  padding:12px 18px;
+  border:1px solid var(--accent);
+  border-radius:10px;
+  color:var(--accent);
+  text-decoration:none;
+  font-weight:800;
+  font-size:14px;
+  transition:.2s
+}
+
+.github-btn:hover{
+  background:var(--accent);
+  color:var(--bg)
+}
+
+.video-box{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:28px
+}
+
+.video-placeholder{
+  min-height:280px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  border:1px dashed var(--line);
+  border-radius:14px;
+  color:var(--muted);
+  background:#070a0f
+}
+
+footer{
+  margin-top:90px;
+  padding-top:30px;
+  border-top:1px solid var(--line);
+  color:var(--muted);
+  font-size:13px
+}
+
+@media(max-width:800px){
+  .grid,.grid.three{grid-template-columns:1fr}
+  .section-head{grid-template-columns:1fr}
+  .section-head p{grid-column:1}
+  .arch{grid-template-columns:1fr}
+  .arrow{transform:rotate(90deg);text-align:center}
+  main{padding:52px 20px 80px}
+}
+</style>
+</head>
+
+<body>
+<main>
+
+<header>
+  <div class="eyebrow">AI X YAYINLAMA OTOMASYONU · v1.0</div>
+
+  <h1>Yapay Zeka Destekli X Yayınlama Otomasyonu</h1>
+
+  <p class="lead">
+    Bir konu girdisini; yapay zeka ile gönderi üretimi, deterministik doğrulama,
+    yapay zeka tabanlı kalite kontrolü, otomatik revizyon, zamanlama ve güvenli dry-run
+    yayınlama akışı üzerinden X için yayınlanmaya hazır içeriğe dönüştüren modüler otomasyon sistemi.
+  </p>
+
+  <span class="tag">OPENAI · VALIDATION · X CONNECTOR · SCHEDULER · DRY RUN</span>
+
+  <br>
+
+  <a class="github-btn"
+     href="https://github.com/tolgakale-cyber/ai-x-publishing-automation"
+     target="_blank"
+     rel="noopener noreferrer">
+    GitHub'da İncele →
+  </a>
+</header>
+
+
+<section>
+  <div class="section-head">
+    <div class="num">01</div>
+    <div>
+      <h2>Projeye Genel Bakış</h2>
+      <p>
+        Proje, bir sosyal medya fikrinden kontrollü yayınlama aşamasına kadar
+        tekrar eden içerik üretim ve kalite kontrol adımlarını ayrı katmanlara bölerek otomatikleştirir.
+      </p>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <h3>Problem</h3>
+      <p>
+        Bir LLM'den doğrudan gönderi almak; karakter sınırı, içerik kalitesi,
+        tutarlılık ve yayınlama güvenliği gibi gereksinimleri tek başına garanti etmez.
+      </p>
+    </div>
+
+    <div class="card">
+      <h3>Yaklaşım</h3>
+      <p>
+        Writer, Validator, Critic, Reviser, Scheduler ve Publisher görevleri
+        birbirinden ayrılır; her aşama kendi sorumluluğunu tamamladıktan sonra sonraki katmana geçer.
+      </p>
+    </div>
+
+    <div class="card">
+      <h3>Amaç</h3>
+      <p>
+        Tek bir konu girdisinden, X kurallarına uygun ve kalite kontrolünden geçmiş
+        bir gönderiyi mümkün olduğunca az manuel müdahaleyle yayınlama akışına hazırlamak.
+      </p>
+    </div>
+
+    <div class="card">
+      <h3>Çıktı</h3>
+      <p>
+        Doğrulanmış gönderi metni, yayınlama veya zamanlama kararı,
+        simüle edilmiş yayın sonucu ve JSON tabanlı işlem geçmişi.
+      </p>
+    </div>
+  </div>
+</section>
+
+
+<section>
+  <div class="section-head">
+    <div class="num">02</div>
+    <div>
+      <h2>Sistem Mimarisi</h2>
+      <p>
+        AI üretimi ile deterministik kontroller birbirinden ayrılır.
+        Gönderi, yayınlama katmanına ulaşmadan önce birden fazla kontrol aşamasından geçer.
+      </p>
+    </div>
+  </div>
+
+  <div class="flow">
+<pre>KONU
+  │
+  ▼
+AI WRITER
+  │
+  ▼
+DETERMİNİSTİK VALIDATOR
+  │
+  ▼
+AI CRITIC
+  │
+  ▼
+AI REVISER
+  │
+  ▼
+FINAL VALIDATOR
+  │
+  ├── geçemezse ──► AUTO-FIX ──┐
+  │                             │
+  ◄─────────────────────────────┘
+  │
+  ▼
+YAYINLAMA MODU
+  │
+  ├── ŞİMDİ YAYINLA ──► X CONNECTOR ──► DRY-RUN PUBLISHER
+  │
+  └── ZAMANLA ────────► SCHEDULER / QUEUE
+                              │
+                              ▼
+                         JSON HISTORY</pre>
+  </div>
+</section>
+
+
+<section>
+  <div class="section-head">
+    <div class="num">03</div>
+    <div>
+      <h2>AI Üretim ve Kalite Döngüsü</h2>
+      <p>
+        İlk AI çıktısı doğrudan yayınlama katmanına gönderilmez.
+        Üretim, kalite değerlendirmesi ve revizyon birbirinden ayrılmış görevler olarak çalışır.
+      </p>
+    </div>
+  </div>
+
+  <div class="arch">
+    <div class="node">
+      <strong>Writer</strong><br>
+      <span class="small">gönderi üretimi</span>
+    </div>
+
+    <div class="arrow">→</div>
+
+    <div class="node">
+      <strong>Critic</strong><br>
+      <span class="small">kalite değerlendirmesi</span>
+    </div>
+
+    <div class="arrow">→</div>
+
+    <div class="node">
+      <strong>Reviser</strong><br>
+      <span class="small">kontrollü revizyon</span>
+    </div>
+  </div>
+</section>
+
+
+<section>
+  <div class="section-head">
+    <div class="num">04</div>
+    <div>
+      <h2>İçerik Doğrulama Sistemi</h2>
+      <p>
+        AI çıktısı, yayınlama kararından bağımsız çalışan deterministik kurallarla kontrol edilir.
+        Böylece model çıktısına tek başına güvenilmez.
+      </p>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <h3>280 Karakter Kontrolü</h3>
+      <p>
+        Gönderinin X için belirlenen maksimum uzunluğu aşıp aşmadığı
+        Python doğrulama katmanında kontrol edilir.
+      </p>
+    </div>
+
+    <div class="card">
+      <h3>Hashtag Kontrolü</h3>
+      <p>
+        Hashtag sayısı ölçülür ve gönderinin belirlenen içerik kurallarına
+        uygunluğu doğrulama raporunda gösterilir.
+      </p>
+    </div>
+
+    <div class="card">
+      <h3>Sayısal İddia Koruması</h3>
+      <p>
+        Revizyon katmanı; orijinal içerikte bulunmayan istatistik, yüzde,
+        performans metriği, süre kazancı veya sayısal iddialar eklememesi için sınırlandırılır.
+      </p>
+    </div>
+
+    <div class="card">
+      <h3>Auto-Fix</h3>
+      <p>
+        Revize edilen içerik kuralları geçemezse sistem otomatik düzeltme
+        aşamasını çalıştırır ve sonucu yeniden doğrular.
+      </p>
+    </div>
+  </div>
+</section>
+
+
+<section>
+  <div class="section-head">
+    <div class="num">05</div>
+    <div>
+      <h2>AI Critic ve Reviser</h2>
+      <p>
+        Kalite değerlendirmesi ile içerik üretimi ayrı sorumluluklar olarak ele alınır.
+        Critic geri bildirim üretir; Reviser bu geri bildirimi kontrollü biçimde uygular.
+      </p>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <h3>AI Critic</h3>
+      <p>
+        Gönderiyi açıklık, konuya uygunluk, profesyonellik ve etkileşim potansiyeli
+        açısından puanlar ve iyileştirme önerisi üretir.
+      </p>
+    </div>
+
+    <div class="card">
+      <h3>AI Reviser</h3>
+      <p>
+        Critic önerisini kullanarak metni yeniden düzenler; anlamı korur,
+        280 karakter sınırını gözetir ve desteklenmeyen yeni iddialar eklememeye çalışır.
+      </p>
+    </div>
+  </div>
+</section>
+
+
+<section>
+  <div class="section-head">
+    <div class="num">06</div>
+    <div>
+      <h2>X Yayınlama Katmanı</h2>
+      <p>
+        İçerik üretimi ile platform bağlantısı birbirinden ayrılmıştır.
+        Portföy sürümünde yayınlama işlemi güvenli dry-run modunda simüle edilir.
+      </p>
+    </div>
+  </div>
+
+  <div class="grid three">
+    <div class="card">
+      <h3>X Connector</h3>
+      <p>
+        X API kimlik bilgileri için ayrı bir bağlantı katmanı bulunur.
+        Gerçek anahtarlar kaynak kod deposuna dahil edilmez.
+      </p>
+    </div>
+
+    <div class="card">
+      <h3>Dry Run</h3>
+      <p>
+        Varsayılan güvenli modda gerçek X hesabına gönderi gönderilmez;
+        yayınlama davranışı simüle edilir.
+      </p>
+    </div>
+
+    <div class="card">
+      <h3>Publisher</h3>
+      <p>
+        Onaylanan içeriği yayınlama katmanına aktarır ve işlem sonucunu
+        standart bir yayınlama raporu olarak döndürür.
+      </p>
+    </div>
+  </div>
+</section>
+
+
+<section>
+  <div class="section-head">
+    <div class="num">07</div>
+    <div>
+      <h2>Zamanlama Sistemi</h2>
+      <p>
+        Final doğrulamayı geçen gönderi için kullanıcı anında yayınlama
+        veya belirli bir tarih ve saate zamanlama seçeneklerinden birini seçebilir.
+      </p>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <h3>Anında Yayınlama</h3>
+      <p>
+        Gönderi Publisher katmanına aktarılır. Dry-run modunda gerçek platform
+        çağrısı yerine simüle edilmiş yayın sonucu oluşturulur.
+      </p>
+    </div>
+
+    <div class="card">
+      <h3>Zamanlanmış Gönderi</h3>
+      <p>
+        Tarih ve saat girdisi Scheduler tarafından işlenir; gönderi
+        simüle edilmiş kuyruğa alınır ve <span class="accent">QUEUED</span> durumu üretilir.
+      </p>
+    </div>
+  </div>
+</section>
+
+
+<section>
+  <div class="section-head">
+    <div class="num">08</div>
+    <div>
+      <h2>Kayıt ve İzlenebilirlik</h2>
+      <p>
+        Yayınlama akışının sonucu yerel JSON geçmişinde saklanarak
+        testlerin ve simüle edilmiş yayın işlemlerinin izlenebilmesi sağlanır.
+      </p>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <h3>JSON History</h3>
+      <p>
+        Platform, durum, içerik, yayınlanma bilgisi, post ID ve zaman damgası
+        gibi alanlar <span class="accent">post_history.json</span> içinde tutulabilir.
+      </p>
+    </div>
+
+    <div class="card">
+      <h3>Demo Post ID</h3>
+      <p>
+        Dry-run yayınlarında gerçek platform kimliği yerine
+        <span class="accent">DEMO-XXXXXXXX</span> biçiminde simüle edilmiş post ID üretilir.
+      </p>
+    </div>
+  </div>
+</section>
+
+
+<section id="demo">
+  <div class="section-head">
+    <div class="num">09</div>
+    <div>
+      <h2>Demo ve Örnek Çıktı</h2>
+      <p>
+        Aşağıdaki örnek, çalışan dry-run akışının ürettiği yayınlama raporunun
+        temsilî görünümünü gösterir. Gerçek bir X gönderisi değildir.
+      </p>
+    </div>
+  </div>
+
+  <div class="flow">
+<pre>--- Publisher Report ---
+Platform: X
+Status: SIMULATED
+Post ID: DEMO-XXXXXXXX
+Published: False
+Timestamp: YYYY-MM-DDTHH:MM:SS</pre>
+  </div>
+</section>
+
+
+<section>
+  <div class="section-head">
+    <div class="num">10</div>
+    <div>
+      <h2>Teknoloji Katmanı</h2>
+      <p>
+        Proje, LLM tabanlı içerik üretimini deterministik Python kontrolleri
+        ve platform entegrasyonuna hazır yayınlama mimarisiyle birleştirir.
+      </p>
+    </div>
+  </div>
+
+  <div class="grid three">
+    <div class="card">
+      <h3>Python</h3>
+      <p>Orkestrasyon, doğrulama, zamanlama ve yayınlama akışı.</p>
+    </div>
+
+    <div class="card">
+      <h3>OpenAI API</h3>
+      <p>Writer, Critic ve Reviser görevlerinde LLM desteği.</p>
+    </div>
+
+    <div class="card">
+      <h3>X Connector</h3>
+      <p>X platformu için ayrıştırılmış entegrasyon ve kimlik bilgisi katmanı.</p>
+    </div>
+
+    <div class="card">
+      <h3>JSON</h3>
+      <p>Yerel yayınlama geçmişi ve örnek işlem kayıtları.</p>
+    </div>
+
+    <div class="card">
+      <h3>python-dotenv</h3>
+      <p>API anahtarlarının ve çalışma ayarlarının ortam değişkenleriyle yönetimi.</p>
+    </div>
+
+    <div class="card">
+      <h3>Git & GitHub</h3>
+      <p>Kaynak kod sürümleme ve portföy repository yönetimi.</p>
+    </div>
+  </div>
+</section>
+
+
+<section>
+  <div class="section-head">
+    <div class="num">11</div>
+    <div>
+      <h2>Mevcut Durum</h2>
+      <p>
+        v1, çalışan AI içerik üretimi ve dry-run yayınlama pipeline'ını içerir.
+        X entegrasyon katmanı hazırdır; mevcut portföy sürümünde gerçek hesap üzerinde yayın yapılmaz.
+      </p>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <h3>v1 · Tamamlananlar</h3>
+      <ul>
+        <li>AI tabanlı gönderi üretimi</li>
+        <li>280 karakter ve hashtag doğrulaması</li>
+        <li>AI Critic kalite değerlendirmesi</li>
+        <li>AI Reviser revizyon döngüsü</li>
+        <li>Desteklenmeyen sayısal iddialara karşı koruma</li>
+        <li>Başarısız revizyonlar için Auto-Fix</li>
+        <li>Anında yayınlama akışı</li>
+        <li>Zamanlama ve QUEUED durumu</li>
+        <li>X Connector mimarisi</li>
+        <li>Dry-run Publisher ve demo post ID</li>
+        <li>JSON işlem geçmişi</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>Proje Prensibi</h3>
+      <p>
+        AI modelleri içerik üretimi ve kalite değerlendirmesinden sorumluyken,
+        Python katmanı kuralları, süreç akışını ve yayınlama güvenliğini yönetir.
+        X entegrasyonu ayrı bir bağlantı katmanında tutulur; mevcut portföy sürümü
+        gerçek hesaba gönderi göndermek yerine bu akışı güvenli biçimde simüle eder.
+      </p>
+    </div>
+  </div>
+</section>
+
+
+<footer>
+  Yapay Zeka Destekli X Yayınlama Otomasyonu · v1.0 · Türkçe teknik proje incelemesi
+</footer>
+
+</main>
+</body>
+</html>
